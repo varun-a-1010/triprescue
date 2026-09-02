@@ -45,9 +45,9 @@ describe("sealSession / openSession", () => {
       expect(tampered).not.toBe(sealed);
       // base64url can encode the same bytes with a different final character
       // (unused trailing bits); a byte-identical "tamper" is not a tamper.
+      flipped += 1;
       if (Buffer.from(tampered, "base64url").equals(Buffer.from(sealed, "base64url"))) continue;
       expect(openSession(tampered), `position ${pos}`).toBeNull();
-      flipped += 1;
     }
     expect(flipped).toBe(6);
   });

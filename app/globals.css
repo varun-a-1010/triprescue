@@ -1,26 +1,304 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   TripRescue tokens. A cool "operations paper" ground with one petrol accent.
+   Violet is reserved for the sandbox badge. Red is reserved for attention:
+   the disruption banner, ineligible reasons, errors and "not verified".
+   --------------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  color-scheme: light;
+  --paper: #eef2f5;
+  --surface: #ffffff;
+  --surface-2: #e3e9ee;
+  --ink: #16212b;
+  --ink-2: #55636f;
+  --ink-3: #8a97a3;
+  --line: #d3dbe2;
+  --line-strong: #b0bcc6;
+  --accent: #0d6a72;
+  --accent-strong: #094f56;
+  --accent-soft: #dcefef;
+  --accent-ink: #0a5259;
+  --on-accent: #ffffff;
+  --alert: #b3261e;
+  --alert-soft: #fbe9e7;
+  --alert-ink: #8c1d16;
+  --sandbox: #5b3fa5;
+  --sandbox-soft: #ebe7f8;
+  --sandbox-ink: #452e85;
+  --backdrop: rgb(22 33 43 / 0.55);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color-scheme: dark;
+    --paper: #0d1317;
+    --surface: #151c22;
+    --surface-2: #1c252d;
+    --ink: #e6ecf0;
+    --ink-2: #a0adb9;
+    --ink-3: #6f7e8b;
+    --line: #26313a;
+    --line-strong: #3b4a56;
+    --accent: #5cc3c9;
+    --accent-strong: #86d6da;
+    --accent-soft: #10343a;
+    --accent-ink: #9de0e3;
+    --on-accent: #0b1518;
+    --alert: #f08477;
+    --alert-soft: #3a1712;
+    --alert-ink: #f6aaa1;
+    --sandbox: #b7a5f1;
+    --sandbox-soft: #29213f;
+    --sandbox-ink: #cfc3f8;
+    --backdrop: rgb(0 0 0 / 0.62);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-on-accent: var(--on-accent);
+  --color-alert: var(--alert);
+  --color-alert-soft: var(--alert-soft);
+  --color-alert-ink: var(--alert-ink);
+  --color-sandbox: var(--sandbox);
+  --color-sandbox-soft: var(--sandbox-soft);
+  --color-sandbox-ink: var(--sandbox-ink);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --radius-card: 12px;
+  --radius-ctl: 8px;
+}
+
+@layer base {
+  html {
+    height: 100%;
+  }
+  body {
+    min-height: 100%;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--accent-soft);
+  }
+  dialog::backdrop {
+    background: var(--backdrop);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+    padding: 0 1rem;
+    border-radius: var(--radius-ctl);
+    border: 1px solid transparent;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    line-height: 1.2;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: var(--accent);
+  }
+  .btn-primary:not(:disabled):hover {
+    background: var(--accent-strong);
+    border-color: var(--accent-strong);
+  }
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--ink);
+    border-color: var(--line-strong);
+  }
+  .btn-secondary:not(:disabled):hover {
+    background: var(--surface-2);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--accent-ink);
+  }
+  .btn-ghost:not(:disabled):hover {
+    background: var(--accent-soft);
+  }
+  .btn-sm {
+    min-height: 2rem;
+    padding: 0 0.75rem;
+    font-size: 0.8125rem;
+  }
+  .btn-lg {
+    min-height: 3rem;
+    padding: 0 1.25rem;
+    font-size: 1rem;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 1.625rem;
+    padding: 0 0.625rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .pill-sm {
+    min-height: 1.375rem;
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+  }
+  .pill-neutral {
+    background: var(--surface-2);
+    color: var(--ink-2);
+  }
+  .pill-muted {
+    background: transparent;
+    color: var(--ink-2);
+    border-color: var(--line-strong);
+  }
+  .pill-accent {
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+  .pill-alert {
+    background: var(--alert-soft);
+    color: var(--alert-ink);
+  }
+  .pill-sandbox {
+    background: var(--sandbox-soft);
+    color: var(--sandbox-ink);
+    border-color: color-mix(in oklab, var(--sandbox) 35%, transparent);
+  }
+
+  .field-input {
+    width: 100%;
+    min-height: 2.5rem;
+    padding: 0 0.75rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-ctl);
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+  }
+  .field-input:focus-visible {
+    border-color: var(--accent);
+    outline-offset: 0;
+  }
+  .field-input[aria-invalid="true"] {
+    border-color: var(--alert);
+  }
+  .field-input:disabled {
+    opacity: 0.6;
+  }
+
+  .disclosure > summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  .disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+  .disclosure-chevron {
+    transition: transform 0.15s ease;
+  }
+  .disclosure[open] > summary .disclosure-chevron {
+    transform: rotate(90deg);
+  }
+
+  .dialog {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(100% - 2rem, 42rem);
+    max-height: calc(100dvh - 2rem);
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 24px 64px -24px rgb(0 0 0 / 0.45);
+    overflow: auto;
+  }
+  .dialog[open] {
+    animation: tr-rise 0.18s ease-out;
+  }
+
+  .skeleton {
+    background: var(--surface-2);
+    border-radius: var(--radius-ctl);
+    animation: tr-pulse 1.6s ease-in-out infinite;
+  }
+  .spinner {
+    animation: tr-spin 0.9s linear infinite;
+  }
+}
+
+@keyframes tr-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+@keyframes tr-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes tr-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
 }
