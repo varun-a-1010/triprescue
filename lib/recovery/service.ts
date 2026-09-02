@@ -111,6 +111,7 @@ async function activePreview(order: ProviderOrder, ctx: ServiceCtx): Promise<Cha
   try {
     const pending = await ctx.provider.getPendingChange(rec.changeId);
     if (pending.confirmedAt) return null;
+    if (isBefore(pending.expiresAt, nowIso())) return null;
     return previewFromPending(rec.previewId, pending.remove.segments.length ? pending.remove : currentSlice(order).itinerary, pending, rec.expiresAt);
   } catch (err) {
     if (isAppError(err) && (err.code === "PREVIEW_EXPIRED" || err.code === "OFFER_EXPIRED")) return null;
@@ -163,21 +164,26 @@ export async function disrupt(ctx: ServiceCtx): Promise<DisruptResult> {
     const order = await ctx.provider.getOrder(orderId);
     return { status: "already_triggered", ...(await tripState(order, ctx)) };
   }
-  // Exactly-once: record the intent BEFORE the mutating provider call so a
-  // concurrent request on the same cookie cannot trigger a second change once
-  // this response lands. (Two truly concurrent first requests are bounded by
-  // the provider's own per-call behaviour; the UI disables the control.)
-  const triggeredAt = nowIso();
-  const change = await ctx.provider.simulateAirlineChange(orderId);
-  ctx.session = {
-    ...ctx.session,
-    disruption: { changeId: change.id, triggeredAt },
-    search: undefined,
-    preview: undefined,
-  };
-  const order = await ctx.provider.getOrder(orderId);
-  log("trip.disrupted", { requestId: ctx.requestId, orderId, changeId: change.id });
-  return { status: "triggered", ...(await tripState(order, ctx)) };
+  // Exactly-once per order on this instance: the provider call is serialized
+  // per orderId and the session is re-checked inside the lock, so a burst of
+  // concurrent requests sharing one session produces one simulated change.
+  return withLock(`disrupt:${orderId}`, async () => {
+    if (ctx.session.disruption) {
+      const order = await ctx.provider.getOrder(orderId);
+      return { status: "already_triggered" as const, ...(await tripState(order, ctx)) };
+    }
+    const triggeredAt = nowIso();
+    const change = await ctx.provider.simulateAirlineChange(orderId);
+    ctx.session = {
+      ...ctx.session,
+      disruption: { changeId: change.id, triggeredAt },
+      search: undefined,
+      preview: undefined,
+    };
+    const order = await ctx.provider.getOrder(orderId);
+    log("trip.disrupted", { requestId: ctx.requestId, orderId, changeId: change.id });
+    return { status: "triggered" as const, ...(await tripState(order, ctx)) };
+  });
 }
 
 export async function search(ctx: ServiceCtx, prefs: RecoveryPreferences): Promise<RecoverySearchResult> {

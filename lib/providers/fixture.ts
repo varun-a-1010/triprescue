@@ -37,7 +37,6 @@ const CARRIER = "ZZ";
 const OFFER_TTL_MINUTES = 30;
 
 declare global {
-  // eslint-disable-next-line no-var
   var __triprescueFixtureStore: FixtureStore | undefined;
 }
 
