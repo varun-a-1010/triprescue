@@ -2,7 +2,6 @@ import "server-only";
 import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 import type { ZodType } from "zod";
-import { getEnv } from "./env";
 import { AppError, isAbortError, isAppError } from "./errors";
 import { mapDuffelError } from "./duffel/errors";
 import { log, logError, newRequestId } from "./log";
@@ -103,7 +102,9 @@ export function defineRoute<I, O>(opts: RouteOptions<I>, handler: (ctx: ServiceC
       cookieStore.set(SESSION_COOKIE, sealSession(ctx.session), {
         httpOnly: true,
         sameSite: "lax",
-        secure: isSecure(req) || getEnv().isProduction,
+        // Secure follows the request scheme (x-forwarded-proto behind a proxy) so
+        // local http testing still gets a cookie while https deployments get Secure.
+        secure: isSecure(req),
         path: "/",
         maxAge: SESSION_MAX_AGE_SECONDS,
       });
