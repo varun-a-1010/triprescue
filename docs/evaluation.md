@@ -5,7 +5,7 @@ Cases: `tests/evals/webmcp-cases.json`. Fill in one row per run. Provider mode a
 | # | Prompt | Browser / model | Provider | Tools called (in order) | Pass? | Notes |
 |---|---|---|---|---|---|---|
 | 1 | What happened to my trip? | | | | | |
-| 2 | Find … arrives by 6 PM, no stops, ≤ £80 extra | | | | | |
+| 2 | Find … arrives by 1 PM, no stops, ≤ $150 extra | | | | | |
 | 3 | Show me exactly what would change … don't book it | | | | | |
 | 4 | Apply that change | | | | | |
 | 5 | Did the change actually go through? | | | | | |

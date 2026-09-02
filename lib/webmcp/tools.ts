@@ -67,6 +67,7 @@ function compactTrip(t: TripState) {
           tripId: t.trip.tripId,
           providerOrderId: t.trip.providerOrderId,
           bookingReference: t.trip.bookingReference,
+          currency: t.trip.currency,
           status: t.trip.status,
           changeAvailable: t.trip.changeAvailable,
           itinerary: compactItinerary(t.trip.itinerary),

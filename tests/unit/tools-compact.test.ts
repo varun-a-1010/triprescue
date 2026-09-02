@@ -53,6 +53,7 @@ const tripState: TripState = {
     providerOrderId: "ord_0000FixtureOrder",
     bookingReference: "FX0001",
     carrierCode: "ZZ",
+    currency: "GBP",
     itinerary: moved,
     status: "booked",
     changeAvailable: true,

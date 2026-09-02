@@ -1,5 +1,5 @@
 import { AppError, isAppError } from "../errors";
-import { orderFingerprint, sameItinerary } from "../fingerprint";
+import { itineraryKey, orderFingerprint, sameItinerary } from "../fingerprint";
 import { log } from "../log";
 import { isPositiveAmount, subtractAmounts } from "../money";
 import { evaluateEligibility, partitionOptions, toRecoveryOption } from "./rank";
@@ -64,6 +64,7 @@ function tripSummary(order: ProviderOrder, ctx: ServiceCtx): TripSummary {
     providerOrderId: order.id,
     bookingReference: order.bookingReference,
     carrierCode: order.ownerCode,
+    currency: order.total.currency,
     itinerary: slice.itinerary,
     status: ctx.session.tripStatus ?? "booked",
     changeAvailable: order.availableActions.includes("change"),
@@ -207,7 +208,25 @@ export async function search(ctx: ServiceCtx, prefs: RecoveryPreferences): Promi
   const now = nowIso();
   const fingerprint = orderFingerprint(order);
   const searchId = opaqueId("srch");
-  const keyed = offers.map((offer) => ({ offer, option: toRecoveryOption(offer, opaqueId("opt"), prefs) }));
+  // Duffel test mode frequently returns several offers with an identical
+  // itinerary and price; keep the first of each so ranking and the agent's
+  // top-3 are not padded with duplicates.
+  // Duffel also lists the traveller's CURRENT flight as a change offer (the
+  // equivalent of accepting the airline's change); that is not a recovery
+  // option, so it is excluded too.
+  const seen = new Set<string>();
+  const currentKey = itineraryKey(slice.itinerary);
+  const distinct = offers.filter((offer) => {
+    if (itineraryKey(offer.add) === currentKey) return false;
+    const key = `${itineraryKey(offer.add)}#${offer.changeTotal.amount}#${offer.penalty.amount}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  if (distinct.length === 0) {
+    throw new AppError("NO_RECOVERY_OPTIONS", "The airline only offered the current flight again; there is no alternative itinerary to change to.");
+  }
+  const keyed = distinct.map((offer) => ({ offer, option: toRecoveryOption(offer, opaqueId("opt"), prefs) }));
   const { eligible, ineligible } = partitionOptions(keyed.map((k) => k.option));
   const visible = [...eligible.slice(0, MAX_UI_OPTIONS), ...ineligible.slice(0, MAX_UI_OPTIONS)];
   let expiresAt = addMinutesIso(now, SEARCH_TTL_MINUTES);
@@ -223,7 +242,7 @@ export async function search(ctx: ServiceCtx, prefs: RecoveryPreferences): Promi
     ...ctx.session,
     search: { searchId, createdAt: now, expiresAt, fingerprint, prefs, currency: offers[0].changeTotal.currency, options },
   };
-  log("recovery.searched", { requestId: ctx.requestId, orderId, searchId, offers: offers.length, eligible: eligible.length });
+  log("recovery.searched", { requestId: ctx.requestId, orderId, searchId, offers: offers.length, distinct: distinct.length, eligible: eligible.length });
   return {
     searchId,
     currency: offers[0].changeTotal.currency,

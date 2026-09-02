@@ -54,7 +54,7 @@ There is no runtime fallback between providers: a Duffel failure is shown as an 
 
 ### Try the tools
 
-- **ChatGPT desktop app** → open the built-in browser from the toolbar → visit the app → the address-bar arrow lists the site tools → ask ChatGPT, e.g. *"What happened to my trip? Find a direct replacement arriving by 6 PM for no more than £80 extra."*
+- **ChatGPT desktop app** → open the built-in browser from the toolbar → visit the app → the address-bar arrow lists the site tools → ask ChatGPT, e.g. *"What happened to my trip? Find a direct replacement arriving by 1 PM for no more than $150 extra."*
 - **Chrome** → enable `chrome://flags/#enable-webmcp-testing` → DevTools → Application → **WebMCP** to inspect and manually invoke each tool.
 
 The demo route is **LHR → LTN on Duffel Airways (ZZ)** because that is the specific scenario Duffel's test mode uses to generate simulated airline-initiated changes.
@@ -95,7 +95,7 @@ Key files: `lib/recovery/service.ts` (the workflow + guards), `lib/webmcp/tools.
 
 ## Limitations
 
-- Duffel test mode only; synthetic schedules and prices; the "airline change" is simulated by Duffel on request.
+- Duffel test mode only; synthetic schedules and prices (every change offer in the sandbox costs the same, in the account's billing currency, USD); the "airline change" is simulated by Duffel on request.
 - One adult, one-way, economy, original airline only (Duffel order changes search the booked carrier).
 - No seats/bags/refunds/cancellation, no accounts, no webhooks (the confirm route refetches instead).
 - The fixture provider's state is in-process memory (documented, non-durable). Deploy as one long-lived Node service (see `render.yaml`).

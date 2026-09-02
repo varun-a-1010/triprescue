@@ -37,7 +37,7 @@ const FICTIONAL_PASSENGER = {
   family_name: "Traveller",
   born_on: "1990-01-01",
   email: "test.traveller@example.com",
-  phone_number: "+447700900123",
+  phone_number: "+447911123456",
 };
 
 type OfferLite = {

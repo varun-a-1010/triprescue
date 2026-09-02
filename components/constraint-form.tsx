@@ -63,7 +63,7 @@ function LimitsSummary({ search, onEdit }: { search: RecoverySearchResult; onEdi
 function LimitsForm({ trip, search, busy, onEditingChange }: Props) {
   const id = useId();
   const offset = offsetOf(trip.itinerary.segments[0]?.departingAt ?? "");
-  const currency = search?.currency ?? "GBP";
+  const currency = search?.currency ?? trip.currency;
   const current = search?.constraints;
   const [arriveBy, setArriveBy] = useState(current?.arriveBy ? toDatetimeLocalValue(current.arriveBy) : "");
   const [maxExtra, setMaxExtra] = useState(current?.maxExtraAmount ?? "");

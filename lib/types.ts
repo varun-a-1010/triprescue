@@ -38,6 +38,8 @@ export type TripSummary = {
   /** Airline booking reference (PNR) */
   bookingReference: string;
   carrierCode: string | null;
+  /** Billing currency of the order; constraints like maxExtraAmount are in this currency */
+  currency: string;
   itinerary: ItinerarySummary;
   status: TripStatus;
   changeAvailable: boolean;
