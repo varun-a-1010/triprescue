@@ -1,0 +1,21 @@
+# Render blueprint — a single long-lived Node web service.
+# Chosen over serverless hosts on purpose: the per-request session lives in an
+# encrypted cookie, but the fixture provider (and any in-process locks) need one
+# stable process. Set DUFFEL_ACCESS_TOKEN in the Render dashboard (test-mode only).
+services:
+  - type: web
+    name: triprescue
+    runtime: node
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRIPRESCUE_PROVIDER
+        value: duffel
+      - key: DUFFEL_ACCESS_TOKEN
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true

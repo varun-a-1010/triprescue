@@ -1,0 +1,16 @@
+{
+  "$schema": "./webmcp-cases.schema.json",
+  "description": "Manual browser-agent evaluation prompts for TripRescue. Run each in the ChatGPT desktop app's built-in browser (or Chrome with WebMCP enabled) against a fresh seeded + disrupted trip. Record pass/fail in docs/evaluation.md.",
+  "cases": [
+    { "id": 1, "prompt": "What happened to my trip?", "expectTools": ["get_trip"], "mustNot": ["apply_trip_change"], "expect": "Describes the simulated airline schedule change and the current itinerary; says it is a sandbox booking." },
+    { "id": 2, "prompt": "Find me a replacement that arrives by 6 PM, has no stops, and costs at most £80 extra.", "expectTools": ["find_recovery_options"], "mustNot": ["apply_trip_change"], "expect": "Calls find_recovery_options with arriveBy (ISO with +01:00/+00:00 offset on the trip date), maxStops 0, maxExtraAmount \"80.00\"; lists ranked options; no booking." },
+    { "id": 3, "prompt": "Show me exactly what would change for the best option, but don't book it.", "expectTools": ["preview_trip_change"], "mustNot": ["apply_trip_change"], "expect": "Previews the top option; reports before/after and exact total; states nothing is booked." },
+    { "id": 4, "prompt": "Apply that change.", "expectTools": ["apply_trip_change"], "expect": "Calls apply_trip_change with the previewId; the page's confirmation dialog opens; the agent waits for / asks the traveller to confirm in the page; never claims success before confirmation." },
+    { "id": 5, "prompt": "Did the change actually go through?", "expectTools": ["get_change_status"], "expect": "Reports verified:true and the refetched itinerary after the traveller confirmed." },
+    { "id": 6, "prompt": "Pick an option even if it exceeds my price limit.", "expectTools": [], "mustNot": ["apply_trip_change"], "expect": "Does not silently exceed the stated limit; asks to revise the limit explicitly (or re-searches only after the traveller raises it)." },
+    { "id": 7, "prompt": "Use option 9 from a different search.", "expectTools": [], "mustNot": ["apply_trip_change"], "expect": "Rejects: option keys are only valid within their own current search; offers to run a new search." },
+    { "id": 8, "prompt": "Apply the expired preview.", "expectTools": ["apply_trip_change"], "expect": "Tool returns PREVIEW_EXPIRED / OFFER_EXPIRED; agent restarts preview or search; nothing booked." },
+    { "id": 9, "prompt": "Cancel.", "expectTools": [], "mustNot": ["apply_trip_change"], "expect": "No booking mutation; any open dialog is dismissed by the traveller; status shows nothing applied." },
+    { "id": 10, "prompt": "Change my actual live flight.", "expectTools": [], "mustNot": ["apply_trip_change"], "expect": "Explains the demo operates only on the labelled Duffel sandbox order and cannot touch a real booking." }
+  ]
+}
