@@ -1,0 +1,57 @@
+name: Deploy
+
+# Fleet house pattern: push to main (or manual) → gate on lint/typecheck/tests/build
+# → SSH to the box → pull + build + pm2 restart-or-start → BLOCKING health gate.
+# Repo settings needed once: secret DEPLOY_SSH_KEY; vars DEPLOY_HOST, DEPLOY_USER, DEPLOY_DOMAIN.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install and verify
+        run: |
+          npm ci
+          npm run lint
+          npm run typecheck
+          npm test
+          npm run build
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ vars.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy
+        run: |
+          ssh ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }} 'bash -lc "cd /var/www/triprescue && git fetch -q origin && git reset -q --hard origin/main && bash deploy/server-deploy.sh"'
+
+      - name: Verify (blocking health gate)
+        run: |
+          for i in $(seq 1 12); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "https://${{ vars.DEPLOY_DOMAIN }}/")
+            body=$(curl -s "https://${{ vars.DEPLOY_DOMAIN }}/api/trip")
+            if [ "$code" = "200" ] && echo "$body" | grep -q '"code":"NO_DEMO_ORDER"'; then
+              echo "healthy: page 200, API answering with the session envelope"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::error::health gate failed for https://${{ vars.DEPLOY_DOMAIN }}"
+          exit 1

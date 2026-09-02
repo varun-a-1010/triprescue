@@ -98,7 +98,7 @@ Key files: `lib/recovery/service.ts` (the workflow + guards), `lib/webmcp/tools.
 - Duffel test mode only; synthetic schedules and prices (every change offer in the sandbox costs the same, in the account's billing currency, USD); the "airline change" is simulated by Duffel on request.
 - One adult, one-way, economy, original airline only (Duffel order changes search the booked carrier).
 - No seats/bags/refunds/cancellation, no accounts, no webhooks (the confirm route refetches instead).
-- The fixture provider's state is in-process memory (documented, non-durable). Deploy as one long-lived Node service (see `render.yaml`).
+- The fixture provider's state is in-process memory (documented, non-durable). Deploy as one long-lived Node service: `deploy/` holds the pm2 + nginx setup used for the live demo, and `render.yaml` is an equivalent one-click alternative.
 
 ## Reset / recovery runbook
 
