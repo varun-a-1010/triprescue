@@ -1,6 +1,6 @@
 # 90-second demo script
 
-Pre-flight (sandbox facts from the spike: offers are direct LHR→LTN flights at 06:00, 12:00 and 18:00, each $125 with a $25 penalty, so "by 1 PM, ≤ $150" keeps two and eliminates one; the "best" is the earliest arrival): fresh session (clear the `triprescue_session` cookie or open a private window), `TRIPRESCUE_PROVIDER=duffel`, ChatGPT desktop app on a supported model with the built-in browser open on the deployed URL. Verify the address-bar tools arrow shows **5 tools** before recording.
+Pre-flight (sandbox facts from the spike: offers are direct LHR→LTN flights at 06:00, 12:00 and 18:00, each $125 with a $25 penalty, so "by 1 PM, ≤ $150" keeps two and eliminates one; the "best" is the earliest arrival): fresh session (clear the `triprescue_session` cookie or open a private window), `TRIPRESCUE_PROVIDER=duffel`, ChatGPT desktop app on a supported model with the built-in browser open on https://triprescue.slate-app.online. Verify the address-bar tools arrow shows **5 tools** before recording.
 
 1. **0–10 s — Problem and proof.** "TripRescue helps a traveller recover a disrupted itinerary. This is a real Duffel test-mode booking and a simulated airline schedule change." Point at the **Duffel Sandbox** badge and the `ord_…` test order id. Click **Create sandbox trip**, then **Simulate airline change**.
 2. **10–20 s — WebMCP discovery.** Open the address-bar arrow: five site tools. "The normal buttons do exactly the same things."
