@@ -66,7 +66,7 @@ npm run lint
 npm run typecheck
 npm test          # unit + fixture-mode integration (safety matrix)
 npm run build
-npm run spike     # Duffel kill-shot: two fresh sandbox orders through the whole lifecycle
+npm run spike     # Duffel kill-shot: two fresh sandbox orders through the whole lifecycle (results: docs/spike-notes.md)
 ```
 
 ## Architecture
