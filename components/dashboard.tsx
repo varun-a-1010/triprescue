@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { derivePhase, disrupt, refresh, seed, useAppState } from "@/lib/client/store";
+import { derivePhase, disrupt, refresh, reset, seed, useAppState } from "@/lib/client/store";
 import type { ProviderMode } from "@/lib/types";
 import { ChangePreview } from "./change-preview";
 import { ConfirmationDialog } from "./confirmation-dialog";
@@ -45,7 +45,7 @@ const swallow = () => {
 export function Dashboard() {
   const state = useAppState();
   const phase = derivePhase(state);
-  const { trip, disruption, search, preview, result, verification, error, busy, providerMode } = state;
+  const { trip, disruption, search, preview, result, verification, error, busy, providerMode, approval } = state;
   const [editingLimits, setEditingLimits] = useState(false);
   const started = useRef(false);
 
@@ -56,6 +56,13 @@ export function Dashboard() {
   }, []);
 
   const liveMessage = busyMessage(busy, providerMode);
+  const startOver = () => {
+    reset()
+      .then(() => {
+        setEditingLimits(false);
+      })
+      .catch(swallow);
+  };
 
   let content: ReactNode = null;
   switch (phase) {
@@ -75,7 +82,7 @@ export function Dashboard() {
               size="lg"
               busy={busy === "disrupt"}
               busyLabel="Simulating…"
-              disabled={busy !== null}
+              disabled={busy !== null || approval !== null}
               onClick={() => {
                 disrupt().catch(swallow);
               }}
@@ -165,6 +172,20 @@ export function Dashboard() {
 
       <main id="main" className="mx-auto w-full max-w-[1100px] flex-1 px-4 py-6 sm:px-6 sm:py-8">
         <Stepper phase={phase} />
+        {trip ? (
+          <div className="mt-3 flex justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              busy={busy === "seed"}
+              busyLabel="Creating a fresh trip…"
+              disabled={busy !== null}
+              onClick={startOver}
+            >
+              Start over with a fresh sandbox trip
+            </Button>
+          </div>
+        ) : null}
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
           <div className="flex min-w-0 flex-col gap-5" aria-busy={busy !== null || undefined}>
             <p role="status" aria-live="polite" className={liveMessage ? "flex items-center gap-2 text-sm text-ink-2" : "sr-only"}>

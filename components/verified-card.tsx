@@ -1,6 +1,6 @@
 "use client";
 
-import { reset, status as checkStatus } from "@/lib/client/store";
+import { status as checkStatus } from "@/lib/client/store";
 import type { ChangeResult, ProviderMode, Verification } from "@/lib/types";
 import { ChangeComparison } from "./change-comparison";
 import { instantLabel, money } from "./format";
@@ -88,19 +88,6 @@ export function VerifiedCard({ result, verification, busy, providerMode }: Props
             }}
           >
             Check status
-          </Button>
-          <Button
-            variant="ghost"
-            busy={busy === "seed"}
-            busyLabel="Creating a fresh trip…"
-            disabled={locked}
-            onClick={() => {
-              reset().catch(() => {
-                // Surfaced through state.error.
-              });
-            }}
-          >
-            Start over with a fresh sandbox trip
           </Button>
         </div>
       </div>
