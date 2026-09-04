@@ -1,6 +1,6 @@
 # Devpost submission copy
 
-Paste-ready text for the WebMCP Challenge form. Live URL: https://triprescue.slate-app.online · Repo: https://github.com/varun-a-1010/triprescue (make public before submitting) · Video: < 3 minutes, with audio, following `docs/demo-script.md`.
+Paste-ready text for the WebMCP Challenge form. Live URL: https://triprescue.slate-app.online · Repo: https://github.com/varun-a-1010/triprescue · Video: https://youtu.be/V4m3feUWsm4.
 
 ## Tagline
 
@@ -25,6 +25,10 @@ The traveller states intent in one sentence ("direct, arriving by 1 PM, at most 
 ## Built with
 
 Next.js 16 (App Router), TypeScript, Zod, Tailwind CSS v4, WebMCP imperative API (`webmcp-types`), Duffel Flights API (test mode, `@duffel/api`), Vitest, pm2 + nginx on Hetzner, GitHub Actions.
+
+## Demo video
+
+https://youtu.be/V4m3feUWsm4
 
 ## Honesty notes for judges
 
